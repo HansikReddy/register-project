@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LOGIN AND REGISTRATION PAGE</title>
+    <link rel="stylesheet" href="../css/style2.css">
+    <h1><span class="blink">REGISTRATION PAGE</span></h1>
+    <style>
+        h1 {
+            color: green;
+        }
+
+        .container {
+            padding: 15px;
+            width: 400px;
+        }
+
+        label,
+        input {
+            margin-bottom: 10px;
+        }
+
+        button {
+            float: right;
+            margin-right: 10px;
+            background-color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <button type="button" class="down-btn">interested</button>
+    <button type="button" class="up-btn">not in mood?</button>
+</body>
+
+<body>
+    <div class="login-page">
+        <div class="form">
+            <form class="login-form">
+                <input id="username" type="text" placeholder="Username" required /><span id="error1"></span>
+                <input id="pass" type="password" placeholder="Password" required /><span id="error2"></span>
+                <input id="cPassword" type="password" placeholder="Confirm Password" required /><span
+                    id="error3"></span>
+                <div id="flip">REGISTER</div>
+            </form>
+            <button id="register" class="start" onclick="register()">REGISTER</button>
+            <p class="message">Already have an account? <a href="../html/login2.html">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $("#flip").click(function () {
+                    $("#register").slideDown("slow");
+                    $("#flip").fadeOut('slow');
+                });
+            });
+            $(document).ready(function blink_text() {
+                $('.blink').fadeOut(500);
+                $('.blink').fadeIn(500);
+                setInterval(blink_text, 1000);
+            });
+       /* $(document).ready(function(){
+                                                                      $("h1").fadeOut('fast');
+                                                                     });*/
+        </script>
+        <style>
+            #flip {
+                padding: 5px;
+                text-align: center;
+                background-color: #78f15f;
+                border: solid 1px #c3c3c3;
+            }
+
+            #register {
+                padding: 5px;
+                text-align: center;
+                background-color: rgba(10, 184, 10, 0.795);
+                border: solid 1px #c3c3c3;
+                display: none;
+            }
+        </style>
+    </head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Base64/1.1.0/base64.js"></script>
+    <script>
+
+        //prefixes of implementation that we want to test
+        window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+        //prefixes of window.IDB objects
+        window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+        window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange
+
+        if (!window.indexedDB) {
+            window.alert("Your browser doesn't support a stable version of IndexedDB.")
+        }
+
+        $(document).ready(function () {
+            $(".start").click(function () {
+                $(".login-page").animate({ width: "100%" }).animate({ fontSize: "46px" }).animate({ borderWidth: 30 });
+            });
+            $(".reset").click(function () {
+                $(".login-page").removeAttr("style");
+            });
+        });
+
+        $(document).ready(function () {
+            // Slide up displayed paragraphs
+            $(".up-btn").click(function () {
+                $(".form").slideUp();
+            });
+
+            // Slide down hidden paragraphs
+            $(".down-btn").click(function () {
+                $(".form").slideDown();
+            });
+        });
+
+        $(document).ready(function () {
+            $('#username,#pass,#cPassword').animate({
+                height: '50px',
+                width: '100%',
+
+            }, 'slow');
+        });
+
+        $(document).ready(function () {
+            $("#cPassword").click(function () {
+                $("p,a").slideDown("slow");
+            });
+        });
+
+        function register() {
+            var error1 = document.getElementById("error1")
+            var error2 = document.getElementById("error2")
+            var error3 = document.getElementById("error3")
+
+            var userName = $("#username").val();
+            var password = $("#pass").val();
+            var confirmPassword = $("#cPassword").val();
+
+            if (userName == "" || userName.trim() === "") {
+                error1.textContent = "Please Enter Username"
+                error1.style.color = "red"
+                return;
+            }
+            if (password == "" || password.trim() === "") {
+                error2.textContent = "Please Enter Password"
+                error2.style.color = "red"
+                return;
+            }
+            if (confirmPassword == "" || confirmPassword.trim() === "") {
+                error3.textContent = "Please Enter Confirm Password"
+                error3.style.color = "red"
+                return;
+            }
+            if (password !== confirmPassword) {
+                error3.textContent = "Password and confirm password should be same"
+                error3.style.color = "red"
+                return;
+            }
+            var register = {
+                "userName": userName,
+                "password": btoa(password)
+            }
+            add(register);
+        }
+
+        const registerData = [
+            { userName: "", password: "" },
+        ];
+        var db;
+        var request = window.indexedDB.open("RegistrationDatabase", 1);
+
+        request.onerror = function (event) {
+            console.log("error: ");
+        };
+
+        request.onsuccess = function (event) {
+            db = request.result;
+            console.log("success: " + db);
+        };
+
+        request.onupgradeneeded = function (event) {
+            var db = event.target.result;
+            var objectStore = db.createObjectStore("registrationDetails", { keyPath: "userName" });
+
+            for (var i in registerData) {
+                objectStore.add(registerData[i]);
+            }
+        }
+
+        function add(register) {
+            var request = db.transaction(["registrationDetails"], "readwrite")
+                .objectStore("registrationDetails")
+                .add(register);
+
+            request.onsuccess = function (event) {
+                alert("You Have Successfully Registered, Please Login To Your Account !!!");
+            };
+
+            request.onerror = function (event) {
+                alert("Username " + register.userName + " Already Exists, Please Try With Different Username");
+            }
+        }
+
+        function readAll() {
+            var objectStore = db.transaction("registrationDetails").objectStore("registrationDetails");
+            objectStore.openCursor().onsuccess = function (event) {
+                var cursor = event.target.result;
+                if (cursor) {
+                    alert("Name for id " + cursor.key + " is " + cursor.value.userName + ", Age: " + cursor.value.password);
+                    cursor.continue();
+                } else {
+                    alert("No more entries!");
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>

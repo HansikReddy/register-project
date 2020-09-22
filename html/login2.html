@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LOGIN PAGE</title>
+    <link rel="stylesheet" href="../css/style2.css">
+    <h1>LOGIN PAGE</h1>
+
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="form">
+            <form class="login-form">
+                <input id="username" type="text" placeholder="Username" required /><span id="error1"></span>
+                <input id="pass" type="password" placeholder="Password" required /><span id="error2"></span>
+
+            </form>
+            <button id="register" onclick="register()">LOGIN</button> <br /><br />
+            <button id="myBtn">Forgot Password</button>
+            <p class="message">Doesn't have an account? <a
+                    href="H:\projects\animated-register\register2.html">REGISTER</a></p>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal">
+
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form class="login-form">
+                <input id="user1" type="text" placeholder="Username" required />
+                <input id="fpassword1" type="password" placeholder="Password" required />
+                <input id="fpassword2" type="password" placeholder="Confirm Password" required />
+            </form>
+            <button id="register" onclick="resetPassword()">RESET PASSWORD</button> <br /><br />
+        </div>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $('#username,#pass,#cPassword').animate({
+                height: '50px',
+                width: '100%',
+
+            }, 'slow');
+        });
+
+    </script>
+
+
+
+    <script>
+
+        //prefixes of implementation that we want to test
+        window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+        //prefixes of window.IDB objects
+        window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+        window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange
+
+        if (!window.indexedDB) {
+            window.alert("Your browser doesn't support a stable version of IndexedDB.")
+        }
+
+        var modal = document.getElementById("myModal");
+        var btn = document.getElementById("myBtn");
+        var span = document.getElementsByClassName("close")[0];
+
+
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function register() {
+            var userName = $("#username").val();
+            var password = $("#pass").val();
+
+            if (userName == "" || userName.trim() === "") {
+                error1.textContent = "Please enter the username"
+                error1.style.color = "red"
+            }
+
+            if (password == "" || password.trim() === "") {
+                var error = document.getElementById("error")
+                error2.textContent = "Please enter the password"
+                error2.style.color = "red"
+            }
+
+            read(userName, password);
+            // var getUserName = localStorage.getItem(userName);
+            // if (getUserName === null || getUserName === undefined) {
+            //     alert("Sorry You Don't Have An Account, Please Register An Account !!!");
+            // } else {
+            //     var retrievedObject = JSON.parse(getUserName);
+            //     var retrivedPassword = retrievedObject.password;
+            //     var decodedString = atob(retrievedObject.password);
+            //     console.log(decodedString)
+            //     if (password !== decodedString) {
+            //         alert("Incorrect Password, Enter Correct Password");
+            //     } else {
+            //         sessionStorage.setItem("userName", retrievedObject.userName);
+            //         window.location.href = "Success.html";
+            //     }
+            // }
+        }
+
+        function resetPassword() {
+            var user1 = $("#user1").val();
+            var fpassword1 = $("#fpassword1").val();
+            var fpassword2 = $("#fpassword2").val();
+
+            if (user1 == "" || user1.trim() === "") {
+                alert("Please Enter Username");
+                return;
+            }
+            if (fpassword1 == "" || fpassword1.trim() === "") {
+                alert("Please Enter Password");
+                return;
+            }
+            if (fpassword2 == "" || fpassword2.trim() === "") {
+                alert("Please Enter Confirm Password");
+                return;
+            }
+            if (fpassword1 !== fpassword2) {
+                alert("Password and confirm password should be same");
+                return;
+            }
+
+            var getUserName = localStorage.getItem(user1);
+            if (getUserName === null || getUserName === undefined) {
+                alert("Sorry You Don't Have An Account, Please Register An Account !!!");
+            } else {
+                localStorage.removeItem("getUserName");
+
+                var register = {
+                    "userName": user1,
+                    "password": fpassword1
+                }
+
+                localStorage.setItem(user1, JSON.stringify(register));
+                alert("Password has been changed successfully !!!");
+            }
+        }
+
+        var db;
+        var request = window.indexedDB.open("RegistrationDatabase", 1);
+
+        request.onerror = function (event) {
+            console.log("error: ");
+        };
+
+        request.onsuccess = function (event) {
+            db = request.result;
+            console.log("success: " + db);
+        };
+
+        function read(userName, password) {
+            var transaction = db.transaction(["registrationDetails"]);
+            var objectStore = transaction.objectStore("registrationDetails");
+            var request = objectStore.get(userName);
+            request.onerror = function (event) {
+                alert("Unable to retrieve daa from database!");
+            };
+            request.onsuccess = function (event) {
+                if (request.result) {
+                    var retrivedPassword = request.result.password;
+                    var decodedPassword = atob(retrivedPassword)
+                    if (password !== decodedPassword) {
+                        alert("Incorrect Password, Please Enter Correct Password");
+                    } else {
+                        sessionStorage.setItem("userName", request.result.userName);
+                        window.location.href = "../html/success.html";
+                    }
+                } else {
+                    alert("Couldn't Find The Account, Please Create A New Account");
+
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

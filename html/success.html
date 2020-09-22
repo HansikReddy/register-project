@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LOGIN AND REGISTRATION PAGE</title>
+    <link rel="stylesheet" href="style2.css">
+    <h1>HOME PAGE</h1>
+
+    <style>
+        h1 { 
+
+            
+            color: green;
+        }
+
+        .container {
+            padding: 15px;
+            width: 400px;
+        }
+
+        label,
+        input {
+            margin-bottom: 10px;
+        }
+
+        button {
+            float: right;
+            margin-right: 10px;
+            background-color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-page">
+        <h1 id="h1"><span id="spanId"></span></h1>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Base64/1.1.0/base64.js"></script>
+    <script>
+    var userName =  sessionStorage.getItem("userName");
+ if(userName==null){
+        window.location.href="login1.html"
+    }
+    $('#h1').append("You Have Successfully LoggedIn "+userName);
+    </script>
+</body>
+
+</html>
