@@ -170,9 +170,6 @@
             add(register);
         }
 
-        const registerData = [
-            { userName: "", password: "" },
-        ];
         var db;
         var request = window.indexedDB.open("RegistrationDatabase", 1);
 
@@ -188,10 +185,6 @@
         request.onupgradeneeded = function (event) {
             var db = event.target.result;
             var objectStore = db.createObjectStore("registrationDetails", { keyPath: "userName" });
-
-            for (var i in registerData) {
-                objectStore.add(registerData[i]);
-            }
         }
 
         function add(register) {

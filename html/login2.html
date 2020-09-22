@@ -14,7 +14,6 @@
             <form class="login-form">
                 <input id="username" type="text" placeholder="Username" required /><span id="error1"></span>
                 <input id="pass" type="password" placeholder="Password" required /><span id="error2"></span>
-
             </form>
             <button id="register" onclick="register()">LOGIN</button> <br /><br />
             <button id="myBtn">Forgot Password</button>
@@ -36,22 +35,15 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
     <script>
 
-        $(document).ready(function () {
+$(document).ready(function () {
             $('#username,#pass,#cPassword').animate({
                 height: '50px',
                 width: '100%',
 
             }, 'slow');
         });
-
-    </script>
-
-
-
-    <script>
 
         //prefixes of implementation that we want to test
         window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -84,34 +76,16 @@
         function register() {
             var userName = $("#username").val();
             var password = $("#pass").val();
-
             if (userName == "" || userName.trim() === "") {
                 error1.textContent = "Please enter the username"
                 error1.style.color = "red"
             }
-
             if (password == "" || password.trim() === "") {
                 var error = document.getElementById("error")
                 error2.textContent = "Please enter the password"
                 error2.style.color = "red"
             }
-
             read(userName, password);
-            // var getUserName = localStorage.getItem(userName);
-            // if (getUserName === null || getUserName === undefined) {
-            //     alert("Sorry You Don't Have An Account, Please Register An Account !!!");
-            // } else {
-            //     var retrievedObject = JSON.parse(getUserName);
-            //     var retrivedPassword = retrievedObject.password;
-            //     var decodedString = atob(retrievedObject.password);
-            //     console.log(decodedString)
-            //     if (password !== decodedString) {
-            //         alert("Incorrect Password, Enter Correct Password");
-            //     } else {
-            //         sessionStorage.setItem("userName", retrievedObject.userName);
-            //         window.location.href = "Success.html";
-            //     }
-            // }
         }
 
         function resetPassword() {
@@ -135,21 +109,7 @@
                 alert("Password and confirm password should be same");
                 return;
             }
-
-            var getUserName = localStorage.getItem(user1);
-            if (getUserName === null || getUserName === undefined) {
-                alert("Sorry You Don't Have An Account, Please Register An Account !!!");
-            } else {
-                localStorage.removeItem("getUserName");
-
-                var register = {
-                    "userName": user1,
-                    "password": fpassword1
-                }
-
-                localStorage.setItem(user1, JSON.stringify(register));
-                alert("Password has been changed successfully !!!");
-            }
+            update(user1, fpassword1);
         }
 
         var db;
@@ -164,8 +124,16 @@
             console.log("success: " + db);
         };
 
+        request.onupgradeneeded = function (event) {
+            var db = event.target.result;
+            var objectStore = db.createObjectStore("registrationDetails", { keyPath: "userName" });
+        }
+
         function read(userName, password) {
             var transaction = db.transaction(["registrationDetails"]);
+            transaction.onerror = function (event) {
+                alert("Unable to retrieve daa from database!");
+            };
             var objectStore = transaction.objectStore("registrationDetails");
             var request = objectStore.get(userName);
             request.onerror = function (event) {
@@ -183,9 +151,27 @@
                     }
                 } else {
                     alert("Couldn't Find The Account, Please Create A New Account");
-
                 }
             }
+        }
+
+        function update(userName, password) {
+            var objectStore = db.transaction(["registrationDetails"], "readwrite").objectStore("registrationDetails");
+            var request = objectStore.get(userName);
+            request.onerror = function (event) {
+                alert("Sorry You Don't Have An Account, Please Register An Account !!!");
+            };
+            request.onsuccess = function (event) {
+                var data = event.target.result;
+                data.password = btoa(password);
+                var requestUpdate = objectStore.put(data);
+                requestUpdate.onerror = function (event) {
+                    alert("Something went wrong, Please Try Again !!!");
+                };
+                requestUpdate.onsuccess = function (event) {
+                    alert("Password has been changed successfully !!!");
+                };
+            };
         }
     </script>
 </body>
