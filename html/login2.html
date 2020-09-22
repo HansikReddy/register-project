@@ -163,6 +163,10 @@ $(document).ready(function () {
             };
             request.onsuccess = function (event) {
                 var data = event.target.result;
+                if(data === undefined){
+                    alert("Sorry You Don't Have An Account, Please Register An Account !!!");
+                    return;
+                }
                 data.password = btoa(password);
                 var requestUpdate = objectStore.put(data);
                 requestUpdate.onerror = function (event) {
